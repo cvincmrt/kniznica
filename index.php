@@ -5,8 +5,10 @@ require_once 'vendor/autoload.php';
 use App\Database;
 use App\Kniha;
 
+$db = new Database();
+$db->pripojDb();
 
-$janosik = new Kniha("Janosik", "Mariana Cengel", "9788055170329", 1);
 
 
+//var_dump($db);
 
