@@ -7,18 +7,18 @@ class Kniha
 {
     private string $nazov;
     private string $autor;
-    private string $ISBN;
+    private string $isbn;
     private int $dostupnost;
 
-    public function __construct($nazov, $autor, $ISBN, $dostupnost){
+    public function __construct($nazov, $autor, $isbn, $dostupnost){
         $this->nazov = $nazov;
         $this->autor = $autor;
-        $this->ISBN = $ISBN;
+        $this->isbn = $isbn;
         $this->dostupnost = $dostupnost;
     }
 
     public function getInfo(){
-        return "Nazov knihy: {$this->nazov}<br>Autor knihy: {$this->autor}<br>Kod ISBN: {$this->ISBN}<br>Stav: {$this->dostupnost}";
+        return "Nazov knihy: {$this->nazov}<br>Autor knihy: {$this->autor}<br>Kod ISBN: {$this->isbn}<br>Stav: {$this->dostupnost}";
     }
 
     public function pozicaj(){
@@ -33,4 +33,20 @@ class Kniha
         $this->dostupnost = 1;
     }
 
+    public function pridajKnihu($db){
+        $sql = "INSERT INTO knihy(nazov, autor, isbn, dostupnost) VALUE (:nazov, :autor, :isbn, :dostupnost)";
+
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindParam(":nazov", $this->nazov);
+        $stmt->bindParam(":autor", $this->autor);
+        $stmt->bindParam(":isbn", $this->isbn);
+        $stmt->bindParam(":dostupnost", $this->dostupnost);
+    
+        if($stmt->execute()){
+            return true;
+        } 
+
+        return false;
+    }
 }

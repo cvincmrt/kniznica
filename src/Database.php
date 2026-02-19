@@ -2,6 +2,7 @@
 
 namespace App;
 use PDO;
+use PDOException;
 
 class Database{
     private string $host = "localhost";
@@ -15,9 +16,10 @@ class Database{
 
         try{
             $this->conn = new PDO("mysql:host={$this->host}; dbname={$this->db_name}", $this->username, $this->password);
+            echo "Databaza je pripojena.";
         }
         catch(PDOException $e){
-            echo "Chyba pripojenia: $e->getMessage()";
+            echo "Databazu sa nepodarilo pripojit: ".$e->getMessage();
         }
 
         return $this->conn;
