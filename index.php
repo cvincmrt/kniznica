@@ -28,8 +28,14 @@ if($db){
     $kniha->ulozZmeny($db);
     echo "Zmena bola zapisana<br>";
     echo $kniha->getInfo();
-   */ 
-  Kniha::vsetkyKnihy($db);
+   
+  $zoznam = Kniha::vsetkyKnihy($db);
+  */
+
+    $isbn = "12345678";
+    $kniha = Kniha::hladajPodlaIsbn($db, $isbn);
+
+    $kniha->zmazKnihu($db);
 
 }
 

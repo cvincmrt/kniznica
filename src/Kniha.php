@@ -47,7 +47,7 @@ class Kniha
             return true;
         } 
 
-        return false;
+    return false;
     }
 
     public static function hladajPodlaIsbn($db, $isbn){
@@ -72,19 +72,29 @@ class Kniha
         $stmt = $db->prepare($sql);
         $stmt->bindParam(":dostupnost", $this->dostupnost);
         
-        return $stmt->execute();
+    return $stmt->execute();
     }
     
     public static function vsetkyKnihy($db){
+        $zoznamKnih = [];
         $sql = "SELECT * FROM knihy";
 
         $stmt = $db->query($sql);
-        //$row = $stmt->fetch(PDO::FETCH_OBJ);
-
-
-        while($row = $stmt->fetch(PDO::FETCH_OBJ)){
-            $pole[] = $row;
+        
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $kniha = new Kniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"]);
+            $zoznamKnih[] = $kniha;
         }
-    var_dump($pole);
+    return $zoznamKnih;
     }
+
+    public function zmazKnihu($db){
+        $sql = "DELETE FROM knihy WHERE isbn = :isbn";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(":isbn", $this->isbn);
+
+    return $stmt->execute();
+    }
+
 }
