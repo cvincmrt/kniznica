@@ -88,13 +88,16 @@ class Kniha
     return $zoznamKnih;
     }
 
-    public function zmazKnihu($db){
+    public static function zmazKnihu($db, $isbn){
         $sql = "DELETE FROM knihy WHERE isbn = :isbn";
 
         $stmt = $db->prepare($sql);
-        $stmt->bindParam(":isbn", $this->isbn);
+        $stmt->bindParam(":isbn", $isbn);
 
-    return $stmt->execute();
+        if($stmt->execute()){
+            return true;
+        }
+    return false;    
     }
 
 }

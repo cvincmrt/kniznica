@@ -32,10 +32,14 @@ if($db){
   $zoznam = Kniha::vsetkyKnihy($db);
   */
 
-    $isbn = "12345678";
-    $kniha = Kniha::hladajPodlaIsbn($db, $isbn);
+    $isbn = "123";
+    $kniha = Kniha::zmazKnihu($db, $isbn);
 
-    $kniha->zmazKnihu($db);
+    if($kniha){
+        echo "kniha bola zmazana!!!";
+    }else{
+        echo "Kniha sa v databaze nenachadza!!!";
+    }
 
 }
 
