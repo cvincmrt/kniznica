@@ -18,14 +18,14 @@ class Kniha
     }
 
     public function getInfo(){
-        return "Nazov knihy: {$this->nazov}<br>Autor knihy: {$this->autor}<br>Kod ISBN: {$this->isbn}<br>Stav: {$this->dostupnost}";
+        return "Nazov knihy: {$this->nazov}<br>Autor knihy: {$this->autor}<br>Kod ISBN: {$this->isbn}<br>Stav: {$this->dostupnost}<br>";
     }
 
     public function pozicaj(){
         if($this->dostupnost){
             $this->dostupnost = 0;
         }else{
-            echo "Chyba: Kniha je uz pozicana!";
+            echo "Chyba: Kniha je uz pozicana!<br>";
         }
     }
 
@@ -48,5 +48,43 @@ class Kniha
         } 
 
         return false;
+    }
+
+    public static function hladajPodlaIsbn($db, $isbn){
+        $sql = "SELECT nazov, autor, isbn, dostupnost FROM knihy WHERE isbn = :isbn";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(":isbn", $isbn);
+
+        $stmt->execute();
+
+        if($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $objekt = new Kniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"]);
+            return $objekt;
+        }else{
+            return null;
+        }
+    }
+
+    public function ulozZmeny($db){
+        $sql = "UPDATE knihy SET dostupnost = :dostupnost";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(":dostupnost", $this->dostupnost);
+        
+        return $stmt->execute();
+    }
+    
+    public static function vsetkyKnihy($db){
+        $sql = "SELECT * FROM knihy";
+
+        $stmt = $db->query($sql);
+        //$row = $stmt->fetch(PDO::FETCH_OBJ);
+
+
+        while($row = $stmt->fetch(PDO::FETCH_OBJ)){
+            $pole[] = $row;
+        }
+    var_dump($pole);
     }
 }

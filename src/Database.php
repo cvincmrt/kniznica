@@ -16,7 +16,7 @@ class Database{
 
         try{
             $this->conn = new PDO("mysql:host={$this->host}; dbname={$this->db_name}", $this->username, $this->password);
-            echo "Databaza je pripojena.";
+            echo "Databaza je pripojena.<br>";
         }
         catch(PDOException $e){
             echo "Databazu sa nepodarilo pripojit: ".$e->getMessage();
