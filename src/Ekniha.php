@@ -16,6 +16,28 @@ use PDO;
         echo "Stahujem eknihu .... Velkost suboru je {$this->velkostSuboru} MB.<br>";
     }
 
+    public function getInfo(){
+        $zakladneInfo = parent::getInfo();
 
+    return $zakladneInfo."Velkost suboru: ".$this->velkostSuboru."MB.<br>";
+    }
+
+    public function pridajKnihu($db){
+        $sql = "INSERT INTO knihy(nazov, autor, isbn, dostupnost, typ, velkostMB) VALUE (:nazov, :autor, :isbn, :dostupnost, 'elektronicka', :velkostSuboru)";
+
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindParam(":nazov", $this->nazov);
+        $stmt->bindParam(":autor", $this->autor);
+        $stmt->bindParam(":isbn", $this->isbn);
+        $stmt->bindParam(":dostupnost", $this->dostupnost);
+        $stmt->bindParam(":velkostSuboru", $this->velkostSuboru);
+            
+        if($stmt->execute()){
+            return true;
+        } 
+
+    return false;
+    }
 
 }

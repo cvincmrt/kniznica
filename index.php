@@ -43,6 +43,21 @@ if($db){
         echo "Kniha sa v databaze nenachadza!!!";
     }
 */
+
+$sandokan = new Ekniha("sandokan", "Adam Hruska", "789456",1, 500);
+$husar = new Kniha("husar", "Jan Hus", "12345",1);
+
+$sandokan->pridajKnihu($db);
+$husar->pridajKnihu($db);
+
+$kniznica = Kniha::vsetkyKnihy($db);
+
+foreach($kniznica as $kniha){
+    echo $kniha->getInfo();
+}
+
+
+
 }
 
 
