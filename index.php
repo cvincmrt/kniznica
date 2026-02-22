@@ -4,13 +4,15 @@ require_once 'vendor/autoload.php';
 
 use App\Database;
 use App\Kniha;
+use App\Ekniha;
+
 
 $connect = new Database();
 $db = $connect->pripojDb();
 
 if($db){
-   /*
-    $dunaj = new Kniha("Dunaj", "Evita Twardzik","12345",1);
+  /*
+    $dunaj = new Kniha("Princ", "Milan Stodola","258",1);
     
     if($dunaj->pridajKnihu($db)){
         echo "Kniha bola pridana";
@@ -18,7 +20,7 @@ if($db){
         echo "Kniha sa nepodarila pridat";
     }
    
-
+ 
   
     $isbn = "12345678";
     $kniha = Kniha::hladajPodlaIsbn($db, $isbn);
@@ -30,7 +32,7 @@ if($db){
     echo $kniha->getInfo();
    
   $zoznam = Kniha::vsetkyKnihy($db);
-  */
+  
 
     $isbn = "123";
     $kniha = Kniha::zmazKnihu($db, $isbn);
@@ -40,7 +42,7 @@ if($db){
     }else{
         echo "Kniha sa v databaze nenachadza!!!";
     }
-
+*/
 }
 
 
