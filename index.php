@@ -10,8 +10,37 @@ use App\Ekniha;
 $connect = new Database();
 $db = $connect->pripojDb();
 
-if($db){
-  /*
+if(!$db){
+    die("Chyba pripojenia k databaze!!!!");
+}
+
+//spracovanie formulara
+
+if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pridaj"])){
+    $nazov = $_POST["nazov"];
+    $autor = $_POST["autor"];
+    $isbn = $_POST["isbn"];
+    $typ = $_POST["typ"];
+    $velkost = $_POST["velkost"];
+
+    if($typ === "papierova"){
+        $novaKniha = new Kniha($nazov, $autor, $isbn, 1);
+    }else{
+        $novaKniha = new Ekniha($nazov, $autor, $isbn, 1, $velkost);
+    }
+
+    if($novaKniha->pridajKnihu($db)){
+        header("Location: index.php?success=1");
+        exit;
+    }
+
+}
+
+$kniznica = Kniha::vsetkyKnihy($db);
+
+
+
+/*
     $dunaj = new Kniha("Princ", "Milan Stodola","258",1);
     
     if($dunaj->pridajKnihu($db)){
@@ -50,41 +79,7 @@ if($db){
 //$sandokan->pridajKnihu($db);
 //$husar->pridajKnihu($db);
 
-//spracovanie formulara
 
-if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pridaj"])){
-    $nazov = $_POST["nazov"];
-    $autor = $_POST["autor"];
-    $isbn = $_POST["isbn"];
-    $typ = $_POST["typ"];
-    $velkost = $_POST["velkost"];
-
-    if($typ === "papierova"){
-        $novaKniha = new Kniha($nazov, $autor, $isbn, 1);
-    }else{
-        $novaKniha = new Ekniha($nazov, $autor, $isbn, 1, $velkost);
-    }
-
-    if($novaKniha->pridajKnihu($db)){
-        echo "<p style='color:green'> Kniha uspesne pridana!!!";
-    }
-
-}
-
-
-
-
-
-/*
-$kniznica = Kniha::vsetkyKnihy($db);
-
-foreach($kniznica as $kniha){
-    echo $kniha->getInfo();
-}
-*/
-
-
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -92,6 +87,16 @@ foreach($kniznica as $kniha){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        tr:hover { background-color: #f9f9f9; }
+        .status-volna { color: green; font-weight: bold; }
+        .status-pozicana { color: red; font-weight: bold; }
+        .typ-tag { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; }
+    </style>
 </head>
 <body>
     <form method="POST">
@@ -108,6 +113,26 @@ foreach($kniznica as $kniha){
         
         <button type="submit" name="pridaj">Pridať do knižnice</button>
     </form>
+   
+    <?php if (isset($_GET['success'])): ?>
+        <p style="color: green; background: #e8f5e9; padding: 10px;">
+            ✅ Kniha bola úspešne pridaná do knižnice!
+        </p>
+    <?php endif; ?>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Názov</th>
+                <th>Autor</th>
+                <th>ISBN</th>
+                <th>Typ</th>
+                <th>Stav</th>
+                <th>Informacie</th>                
+            </tr>
+        </thead>
+
+    </table>
 
     <script>
     function toggleSize() {
