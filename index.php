@@ -43,24 +43,26 @@ if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["akcia"])){
     $isbn = $_POST["isbn_akcia"];
     $kniha_obj = Kniha::hladajPodlaIsbn($db, $isbn);
 
-    if($akcia === "pozicaj"){
-        $kniha_obj->pozicaj();
-        $kniha_obj->ulozZmeny($db);
-        
-    }elseif($akcia === "vrat"){
-        $kniha_obj->vrat();
-        $kniha_obj->ulozZmeny($db);
+    if($kniha_obj){
+        if($akcia === "pozicaj"){
+            $kniha_obj->pozicaj();
+            $kniha_obj->ulozZmeny($db);
+            
+        }elseif($akcia === "vrat"){
+            $kniha_obj->vrat();
+            $kniha_obj->ulozZmeny($db);
 
-    }elseif($akcia === "zmaz"){
-        Kniha::zmazKnihu($db, $isbn);
+        }elseif($akcia === "zmaz"){
+            Kniha::zmazKnihu($db, $isbn);
+        }
+
+        header("Location:index.php");
+        exit;
     }
 
-    header("Location:index.php");
-    exit;
-
 }
-
-$kniznica = Kniha::vsetkyKnihy($db);
+$hladat = isset($_GET["s"]) ? $_GET["s"] : "";
+$kniznica = Kniha::vsetkyKnihy($db, $hladat);
 
 ?>
 <!DOCTYPE html>
@@ -68,7 +70,7 @@ $kniznica = Kniha::vsetkyKnihy($db);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Kniznica</title>
     <style>
         body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -102,6 +104,15 @@ $kniznica = Kniha::vsetkyKnihy($db);
         </p>
     <?php endif; ?>
 
+    <form method="GET">
+        <input type="text" name="s" placeholder="Hladaj knihu, alebo autora..." value="<?= isset($_GET["s"]) ? htmlspecialchars($_GET["s"]) : ""; ?>">
+        <button type="submit">Hladaj</button><br>
+
+        <?php if(isset($_GET["s"]) && $_GET["s"] != ""): ?>
+            <a href="index.php">Zruš filter</a>
+        <?php endif; ?>
+    </form>
+
     <table>
         <thead>
             <tr>
@@ -119,8 +130,8 @@ $kniznica = Kniha::vsetkyKnihy($db);
                     <td><?= $kniha->getNazov(); ?></td>
                     <td><?= $kniha->getAutor(); ?></td>
                     <td><?= $kniha->getIsbn(); ?></td>
-                    <td><?= ($kniha instanceof Ekniha) ? "elektronicka -> {$kniha->getVelkostSuboru()}MB" : "papierova" ?></td>
-                    <td><?= $kniha->getDostupnost(); ?></td>
+                    <td><?= ($kniha instanceof Ekniha) ? "💻 E-kniha -> {$kniha->getVelkostSuboru()}MB" : "📖 Papierová" ?></td>
+                    <td><?= ($kniha->getDostupnost()) ? "✅ Voľná" : "❌ Požičaná"; ?></td>
                     <td>
                         <form method="POST">
                             <input type="hidden" name="isbn_akcia" value="<?= $kniha->getIsbn(); ?>">

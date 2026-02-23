@@ -95,11 +95,22 @@ class Kniha
     return $stmt->execute();
     }
     
-    public static function vsetkyKnihy($db){
+    public static function vsetkyKnihy($db, $hladat = ""){
         $zoznamKnih = [];
-        $sql = "SELECT * FROM knihy";
 
-        $stmt = $db->query($sql);
+        if(!empty($hladat)){
+            $sql = "SELECT * FROM knihy WHERE nazov LIKE :hladat OR autor LIKE :hladat";
+
+            $stmt = $db->prepare($sql);
+            $term = "%$hladat%";
+            $stmt->bindParam(":hladat", $term);
+
+            $stmt->execute();
+
+        }else{
+            $sql = "SELECT * FROM knihy";
+            $stmt = $db->query($sql);
+        }
         
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
             if($row["typ"] === "papierova"){
