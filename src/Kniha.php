@@ -27,6 +27,19 @@ class Kniha
         return $this->nazov;
     }
 
+    public function getAutor(){
+        return $this->autor;
+    }
+
+    public function getIsbn(){
+        return $this->isbn;
+    }
+
+    public function getDostupnost(){
+        return $this->dostupnost;
+    }
+
+
     public function pozicaj(){
         if($this->dostupnost){
             $this->dostupnost = 0;
@@ -57,7 +70,7 @@ class Kniha
     }
 
     public static function hladajPodlaIsbn($db, $isbn){
-        $sql = "SELECT nazov, autor, isbn, dostupnost, typ FROM knihy WHERE isbn = :isbn";
+        $sql = "SELECT nazov, autor, isbn, dostupnost, typ FROM knihy WHERE isbn = :isbn LIMIT 1";
 
         $stmt = $db->prepare($sql);
         $stmt->bindParam(":isbn", $isbn);

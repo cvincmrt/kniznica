@@ -22,6 +22,10 @@ use PDO;
     return $zakladneInfo."Velkost suboru: ".$this->velkostSuboru."MB.<br>";
     }
 
+    public function getVelkostSuboru(){
+        return $this->velkostSuboru;
+    }
+
     public function pridajKnihu($db){
         $sql = "INSERT INTO knihy(nazov, autor, isbn, dostupnost, typ, velkostMB) VALUE (:nazov, :autor, :isbn, :dostupnost, 'elektronicka', :velkostSuboru)";
 

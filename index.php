@@ -14,7 +14,7 @@ if(!$db){
     die("Chyba pripojenia k databaze!!!!");
 }
 
-//spracovanie formulara
+//spracovanie formulara na pridanie knihy
 
 if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pridaj"])){
     $nazov = $_POST["nazov"];
@@ -36,49 +36,31 @@ if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pridaj"])){
 
 }
 
+//spracovanie formulara na vykonanie akcie 
+
+if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["akcia"])){
+    $akcia = $_POST["akcia"];
+    $isbn = $_POST["isbn_akcia"];
+    $kniha_obj = Kniha::hladajPodlaIsbn($db, $isbn);
+
+    if($akcia === "pozicaj"){
+        $kniha_obj->pozicaj();
+        $kniha_obj->ulozZmeny($db);
+        
+    }elseif($akcia === "vrat"){
+        $kniha_obj->vrat();
+        $kniha_obj->ulozZmeny($db);
+
+    }elseif($akcia === "zmaz"){
+        Kniha::zmazKnihu($db, $isbn);
+    }
+
+    header("Location:index.php");
+    exit;
+
+}
+
 $kniznica = Kniha::vsetkyKnihy($db);
-
-
-
-/*
-    $dunaj = new Kniha("Princ", "Milan Stodola","258",1);
-    
-    if($dunaj->pridajKnihu($db)){
-        echo "Kniha bola pridana";
-    }else{
-        echo "Kniha sa nepodarila pridat";
-    }
-   
- 
-  
-    $isbn = "12345678";
-    $kniha = Kniha::hladajPodlaIsbn($db, $isbn);
-
-    echo $kniha->getInfo();
-    $kniha->pozicaj();
-    $kniha->ulozZmeny($db);
-    echo "Zmena bola zapisana<br>";
-    echo $kniha->getInfo();
-   
-  $zoznam = Kniha::vsetkyKnihy($db);
-  
-
-    $isbn = "123";
-    $kniha = Kniha::zmazKnihu($db, $isbn);
-
-    if($kniha){
-        echo "kniha bola zmazana!!!";
-    }else{
-        echo "Kniha sa v databaze nenachadza!!!";
-    }
-*/
-
-//$sandokan = new Ekniha("sandokan", "Adam Hruska", "789456",1, 500);
-//$husar = new Kniha("husar", "Jan Hus", "12345",1);
-
-//$sandokan->pridajKnihu($db);
-//$husar->pridajKnihu($db);
-
 
 ?>
 <!DOCTYPE html>
@@ -128,9 +110,32 @@ $kniznica = Kniha::vsetkyKnihy($db);
                 <th>ISBN</th>
                 <th>Typ</th>
                 <th>Stav</th>
-                <th>Informacie</th>                
+                <th>Akcia</th>                
             </tr>
         </thead>
+        <tbody>
+            <?php foreach($kniznica as $kniha): ?>
+                <tr>
+                    <td><?= $kniha->getNazov(); ?></td>
+                    <td><?= $kniha->getAutor(); ?></td>
+                    <td><?= $kniha->getIsbn(); ?></td>
+                    <td><?= ($kniha instanceof Ekniha) ? "elektronicka -> {$kniha->getVelkostSuboru()}MB" : "papierova" ?></td>
+                    <td><?= $kniha->getDostupnost(); ?></td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="isbn_akcia" value="<?= $kniha->getIsbn(); ?>">
+                            <?php if($kniha->getDostupnost()): ?>
+                                        <button type="submit" name="akcia" value="pozicaj">Požičať</button>
+                            <?php else:?>
+                                        <button type="submit" name="akcia" value="vrat">Vrátiť</button>
+                            <?php endif; ?>    
+
+                            <button type="submit" name="akcia" value="zmaz" onclick="return confirm('Naozaj zmazať!!!')">Zmaž</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
 
     </table>
 
