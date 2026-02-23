@@ -73,10 +73,11 @@ class Kniha
     }
 
     public function ulozZmeny($db){
-        $sql = "UPDATE knihy SET dostupnost = :dostupnost";
+        $sql = "UPDATE knihy SET dostupnost = :dostupnost WHERE isbn = :isbn" ;
 
         $stmt = $db->prepare($sql);
         $stmt->bindParam(":dostupnost", $this->dostupnost);
+        $stmt->bindParam(":isbn", $this->isbn);
         
     return $stmt->execute();
     }
