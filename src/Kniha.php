@@ -3,7 +3,7 @@
 namespace App;
 use PDO;
 
-class Kniha
+abstract class Kniha
 {
     protected string $nazov;
     protected string $autor;
@@ -52,25 +52,10 @@ class Kniha
         $this->dostupnost = 1;
     }
 
-    public function pridajKnihu($db){
-        $sql = "INSERT INTO knihy(nazov, autor, isbn, dostupnost, typ) VALUE (:nazov, :autor, :isbn, :dostupnost, 'papierova')";
-
-        $stmt = $db->prepare($sql);
-
-        $stmt->bindParam(":nazov", $this->nazov);
-        $stmt->bindParam(":autor", $this->autor);
-        $stmt->bindParam(":isbn", $this->isbn);
-        $stmt->bindParam(":dostupnost", $this->dostupnost);
-            
-        if($stmt->execute()){
-            return true;
-        } 
-
-    return false;
-    }
+    abstract public function pridajKnihu($db);
 
     public static function hladajPodlaIsbn($db, $isbn){
-        $sql = "SELECT nazov, autor, isbn, dostupnost, typ FROM knihy WHERE isbn = :isbn LIMIT 1";
+        $sql = "SELECT nazov, autor, isbn, dostupnost, typ, velkostMB FROM knihy WHERE isbn = :isbn LIMIT 1";
 
         $stmt = $db->prepare($sql);
         $stmt->bindParam(":isbn", $isbn);
@@ -78,12 +63,17 @@ class Kniha
         $stmt->execute();
 
         if($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-            $objekt = new Kniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"]);
-            return $objekt;
-        }else{
-            return null;
+            if($row["typ"] === "papierova"){
+                $objekt = new Pkniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"]);
+                return $objekt;
+            }else{
+                $objekt = new Ekniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"], $row["velkostMB"]);
+                return $objekt;
+            }
         }
+        return null;
     }
+    
 
     public function ulozZmeny($db){
         $sql = "UPDATE knihy SET dostupnost = :dostupnost WHERE isbn = :isbn" ;
@@ -114,7 +104,7 @@ class Kniha
         
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
             if($row["typ"] === "papierova"){
-                $kniha = new Kniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"]);
+                $kniha = new Pkniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"]);
                 $zoznamKnih[] = $kniha;
             }else{
                 $kniha = new Ekniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"],$row["velkostMB"]);

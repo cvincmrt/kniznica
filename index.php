@@ -5,6 +5,7 @@ require_once 'vendor/autoload.php';
 use App\Database;
 use App\Kniha;
 use App\Ekniha;
+use App\Pkniha;
 
 
 $connect = new Database();
@@ -24,7 +25,7 @@ if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pridaj"])){
     $velkost = $_POST["velkost"];
 
     if($typ === "papierova"){
-        $novaKniha = new Kniha($nazov, $autor, $isbn, 1);
+        $novaKniha = new Pkniha($nazov, $autor, $isbn, 1);
     }else{
         $novaKniha = new Ekniha($nazov, $autor, $isbn, 1, $velkost);
     }
