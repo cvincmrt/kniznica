@@ -103,12 +103,17 @@ abstract class Kniha
         }
         
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-            if($row["typ"] === "papierova"){
-                $kniha = new Pkniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"]);
-                $zoznamKnih[] = $kniha;
-            }else{
-                $kniha = new Ekniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"],$row["velkostMB"]);
-                $zoznamKnih[] = $kniha;
+            try{
+                if($row["typ"] === "papierova"){
+                    $kniha = new Pkniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"]);
+                    $zoznamKnih[] = $kniha;
+                }else{
+                    $kniha = new Ekniha($row["nazov"], $row["autor"], $row["isbn"], $row["dostupnost"],$row["velkostMB"]);
+                    $zoznamKnih[] = $kniha;
+                }
+            } catch (\Exception $e){
+                //ak je chyba v databaze tak preskoc jednu knihu a pokracuj
+                continue;
             }
           
         }

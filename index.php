@@ -7,6 +7,7 @@ use App\Kniha;
 use App\Ekniha;
 use App\Pkniha;
 
+$chyba_vypis = null;
 
 $connect = new Database();
 $db = $connect->pripojDb();
@@ -24,17 +25,20 @@ if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pridaj"])){
     $typ = $_POST["typ"];
     $velkost = $_POST["velkost"];
 
-    if($typ === "papierova"){
-        $novaKniha = new Pkniha($nazov, $autor, $isbn, 1);
-    }else{
-        $novaKniha = new Ekniha($nazov, $autor, $isbn, 1, $velkost);
-    }
+    try{
+        if($typ === "papierova"){
+            $novaKniha = new Pkniha($nazov, $autor, $isbn, 1);
+        }else{
+            $novaKniha = new Ekniha($nazov, $autor, $isbn, 1, $velkost);
+        }
 
-    if($novaKniha->pridajKnihu($db)){
-        header("Location: index.php?success=1");
-        exit;
+        if($novaKniha->pridajKnihu($db)){
+            header("Location: index.php?success=1");
+            exit;
+        }
+    } catch(\Exception $e){
+        $chyba_vypis = $e->getMessage();
     }
-
 }
 
 //spracovanie formulara na vykonanie akcie 
@@ -42,25 +46,29 @@ if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pridaj"])){
 if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["akcia"])){
     $akcia = $_POST["akcia"];
     $isbn = $_POST["isbn_akcia"];
-    $kniha_obj = Kniha::hladajPodlaIsbn($db, $isbn);
 
-    if($kniha_obj){
-        if($akcia === "pozicaj"){
-            $kniha_obj->pozicaj();
-            $kniha_obj->ulozZmeny($db);
-            
-        }elseif($akcia === "vrat"){
-            $kniha_obj->vrat();
-            $kniha_obj->ulozZmeny($db);
+    try{
+        $kniha_obj = Kniha::hladajPodlaIsbn($db, $isbn);
 
-        }elseif($akcia === "zmaz"){
-            Kniha::zmazKnihu($db, $isbn);
+        if($kniha_obj){
+            if($akcia === "pozicaj"){
+                $kniha_obj->pozicaj();
+                $kniha_obj->ulozZmeny($db);
+                
+            }elseif($akcia === "vrat"){
+                $kniha_obj->vrat();
+                $kniha_obj->ulozZmeny($db);
+
+            }elseif($akcia === "zmaz"){
+                Kniha::zmazKnihu($db, $isbn);
+            }
+
+            header("Location:index.php");
+            exit;
         }
-
-        header("Location:index.php");
-        exit;
+    } catch(\Exception $e){
+        $chyba_vypis = "Systemova chyba".$e->getMessage();
     }
-
 }
 $hladat = isset($_GET["s"]) ? $_GET["s"] : "";
 $kniznica = Kniha::vsetkyKnihy($db, $hladat);
@@ -113,6 +121,12 @@ $kniznica = Kniha::vsetkyKnihy($db, $hladat);
             <a href="index.php">Zruš filter</a>
         <?php endif; ?>
     </form>
+
+    <?php if ($chyba_vypis): ?>
+        <p style="color: red; font-weight: bold; border: 1px solid red; padding: 10px;">
+            ❌ <?= $chyba_vypis ?>
+        </p>
+    <?php endif; ?>
 
     <table>
         <thead>

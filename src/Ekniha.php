@@ -6,9 +6,20 @@ use PDO;
     class Ekniha extends Kniha{
     private float $velkostSuboru;
 
+    private function setVelkostSuboru($mb){
+        if($mb <= 0){
+            throw new \Exception("Velkost e-knihy musi byt kladne cislo!!!");
+        }
+        $this->velkostSuboru = $mb;
+    }
+
     public function __construct($nazov, $autor, $isbn, $dostupnost, $velkostSuboru)
     {
         parent::__construct($nazov, $autor, $isbn, $dostupnost);
+
+        if($velkostSuboru <= 0){
+            throw new \Exception("Velkost e-knihy musi byt kladne cislo!!!");
+        }
         $this->velkostSuboru = $velkostSuboru;
     }
 
